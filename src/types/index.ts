@@ -168,7 +168,7 @@ export interface RoyaltyConfig {
 // ─────────────────────────────────────────────────────────────
 // UI STATE
 // ─────────────────────────────────────────────────────────────
-export type AppTab = "dashboard" | "pay" | "stream" | "audit" | "more"
+export type AppTab = "dashboard" | "pay" | "receive" | "stream" | "swap" | "audit" | "escrow" | "resources" | "more"
 
 export interface ToastMessage {
   id:       string
