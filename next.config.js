@@ -16,7 +16,7 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",  // Next.js requires these
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
@@ -29,7 +29,7 @@ const nextConfig = {
     ]
   },
 
-  // Webpack: fix for wagmi/viem in Next.js
+  // Webpack: fix for wagmi/viem + missing x402 packages
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -37,11 +37,12 @@ const nextConfig = {
       net:    false,
       tls:    false,
       crypto: false,
+      // 👇 ये दो लाइनें नई जोड़ी गई हैं (ताकि एरर न आए)
+      "@x402/evm": false,
+      "@x402/sym": false,
     }
     return config
   },
 }
 
 module.exports = nextConfig
-
-
