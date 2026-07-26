@@ -21,6 +21,10 @@ import { WelcomeModal,
 import { SendScreen,
          ReceiveScreen,
          AuditScreen }         from "@/components/payment/PaymentScreens"
+import { StreamScreen }        from "@/components/streaming/StreamScreen"
+import { ResourcesScreen }     from "@/components/resources/ResourcesScreen"
+import { SwapScreen }          from "@/components/payment/SwapScreen"
+import { EscrowScreen }        from "@/components/payment/EscrowScreen"
 import type { AppTab, TxState } from "@/types"
 
 export default function Home() {
@@ -136,36 +140,3 @@ export default function Home() {
     </ToastProvider>
   )
 }
-
-// ── PLACEHOLDER (temporary for Phase 2 screens) ──────────────
-function PlaceholderScreen({
-  title, subtitle, onNavigate,
-}: { title: string; subtitle: string; onNavigate: (s: string) => void }) {
-  return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-      <div style={{
-        position: "sticky", top: 0, zIndex: 20,
-        background: "var(--bg)", borderBottom: "1px solid var(--border)",
-        padding: "14px 20px", display: "flex", alignItems: "center", gap: "12px",
-      }}>
-        <button
-          onClick={() => onNavigate("dashboard")}
-          style={{ background: "none", border: "none", color: "var(--text-dim)", fontSize: "20px", cursor: "pointer" }}
-        >←</button>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: "13px", letterSpacing: "0.1em",
-                       color: "var(--text)", textTransform: "uppercase" }}>
-          {title}
-        </span>
-      </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column",
-                    alignItems: "center", justifyContent: "center", padding: "40px 24px", textAlign: "center" }}>
-        <div style={{ fontSize: "40px", marginBottom: "16px" }}>⟳</div>
-        <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--text-dim)" }}>
-          {subtitle}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-
