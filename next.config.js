@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
 
+  // Security headers
   async headers() {
     return [
       {
@@ -28,18 +29,27 @@ const nextConfig = {
     ]
   },
 
-  webpack: (config) => {
+  // Webpack: fix for @x402 missing modules
+  webpack: (config, { isServer }) => {
+    // Ignore all @x402 imports (they are not needed for this app)
+    const webpack = require('webpack');
+    config.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^@x402\//,
+      })
+    );
+
+    // Fallbacks for Node.js modules
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
       net: false,
       tls: false,
       crypto: false,
-      "@x402/evm": false,
-      "@x402/sym": false,
-    }
-    return config
-  },
-}
+    };
 
-module.exports = nextConfig
+    return config;
+  },
+};
+
+module.exports = nextConfig;
