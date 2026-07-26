@@ -2,7 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
 
-  // Security headers
   async headers() {
     return [
       {
@@ -29,24 +28,30 @@ const nextConfig = {
     ]
   },
 
-  // Webpack: fix for @x402 missing modules
   webpack: (config, { isServer }) => {
-    // Ignore all @x402 imports (they are not needed for this app)
     const webpack = require('webpack');
+
+    // 1️⃣ IgnorePlugin – पूरे @x402 परिवार को नज़रअंदाज़ करेगा
     config.plugins.push(
       new webpack.IgnorePlugin({
         resourceRegExp: /^@x402\//,
       })
     );
 
-    // Fallbacks for Node.js modules
+    // 2️⃣ हर संभव @x402 सब-पाथ को false पर सेट करें (ताकि Webpack उन्हें ढूंढे ही नहीं)
     config.resolve.fallback = {
       ...config.resolve.fallback,
-      fs: false,
-      net: false,
-      tls: false,
-      crypto: false,
+      '@x402/evm': false,
+      '@x402/sym': false,
+      '@x402/core': false,
+      '@x402': false,
     };
+
+    // 3️⃣ Node.js कोर मॉड्यूल को भी false करें
+    config.resolve.fallback.fs = false;
+    config.resolve.fallback.net = false;
+    config.resolve.fallback.tls = false;
+    config.resolve.fallback.crypto = false;
 
     return config;
   },
