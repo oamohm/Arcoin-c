@@ -1,142 +1,44 @@
-"use client"
-/**
- * ARCOIN — page.tsx
- * Root entry point. Handles:
- *   - Unauthenticated → Connect Screen
- *   - Authenticated   → Dashboard (with Welcome modal first-time)
- *
- * All navigation state lives here and is passed down as props.
- * No router needed for single-page app feel.
- */
-
-import { useState, useEffect } from "react"
-import { usePrivy }            from "@privy-io/react-auth"
-import { ToastProvider }       from "@/components/ui/Toast"
-import { TxStatusBar }         from "@/components/ui/TxStatusBar"
-import { Dashboard }           from "@/components/wallet/Dashboard"
-import { ConnectScreen }       from "@/components/wallet/ConnectScreen"
-import { WelcomeModal,
-         BottomNav,
-         MoreScreen }          from "@/components/layout/LayoutComponents"
-import { SendScreen,
-         ReceiveScreen,
-         AuditScreen }         from "@/components/payment/PaymentScreens"
-import { StreamScreen }        from "@/components/streaming/StreamScreen"
-import { ResourcesScreen }     from "@/components/resources/ResourcesScreen"
-import { SwapScreen }          from "@/components/payment/SwapScreen"
-import { EscrowScreen }        from "@/components/payment/EscrowScreen"
-import type { AppTab, TxState } from "@/types"
-
-export default function Home() {
-  const { ready, authenticated } = usePrivy()
-
-  const [tab,          setTab]    = useState<AppTab>("dashboard")
-  const [showWelcome,  setWelcome] = useState(false)
-  const [globalTxState, setGlobalTxState] = useState<TxState>({ status: "idle" })
-  const [globalTxLabel, setGlobalTxLabel] = useState("")
-
-  // On first auth, show Welcome modal
-  useEffect(() => {
-    if (authenticated) {
-      const seen = localStorage.getItem("arcoin_v1_welcomed")
-      if (!seen) {
-        setWelcome(true)
-        localStorage.setItem("arcoin_v1_welcomed", "true")
-      }
-    }
-  }, [authenticated])
-
-  // Loading state
-  if (!ready) {
-    return (
-      <div style={{
-        minHeight: "100dvh", display: "flex",
-        alignItems: "center", justifyContent: "center",
-        background: "var(--bg)",
-      }}>
-        <div style={{
-          width: "40px", height: "40px", borderRadius: "12px",
-          border: "1.5px solid var(--cyan)", background: "var(--cyan-glow)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "20px", animation: "logo-glow 1.5s ease-in-out infinite",
-        }}>◈</div>
-      </div>
-    )
+{
+  "name": "arcoin-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "14.2.29",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@privy-io/react-auth": "^1.91.0",
+    "@privy-io/wagmi": "^0.2.6",
+    "wagmi": "^2.14.16",
+    "viem": "^2.21.58",
+    "@tanstack/react-query": "^5.59.20",
+    "@wagmi/core": "^2.14.6",
+    "@x402/evm": "^1.0.0",
+    "@x402/sym": "^1.0.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
+    "papaparse": "^5.4.1",
+    "qrcode.react": "^4.2.0",
+    "lucide-react": "^0.454.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.9",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/papaparse": "^5.3.15",
+    "typescript": "^5.6.3",
+    "tailwindcss": "^3.4.15",
+    "postcss": "^8.4.49",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.29"
   }
-
-  // Not connected → full connect screen
-  if (!authenticated) {
-    return (
-      <ToastProvider>
-        <ConnectScreen />
-      </ToastProvider>
-    )
-  }
-
-  // Shared navigation function passed to all screens
-  const navigate = (screen: string) => {
-    setTab(screen as AppTab)
-  }
-
-  // Shared tx state handler (used by SendScreen, SwapScreen, etc.)
-  const handleTxState = (state: TxState, label?: string) => {
-    setGlobalTxState(state)
-    if (label) setGlobalTxLabel(label)
-    if (state.status === "idle") setGlobalTxLabel("")
-  }
-
-  return (
-    <ToastProvider>
-      <main style={{
-        maxWidth:      "480px",
-        margin:        "0 auto",
-        minHeight:     "100dvh",
-        display:       "flex",
-        flexDirection: "column",
-        position:      "relative",
-        background:    "var(--bg)",
-      }}>
-
-        {/* ── ACTIVE SCREEN ─────────────────────────── */}
-        <div style={{
-          flex:          1,
-          display:       "flex",
-          flexDirection: "column",
-          paddingBottom: "calc(72px + env(safe-area-inset-bottom, 0px))",
-          overflowY:     "auto",
-        }}>
-          {tab === "dashboard" && <Dashboard onNavigate={navigate} />}
-          {tab === "pay"       && (
-            <SendScreen
-              onNavigate={navigate}
-              onTxState={handleTxState}
-            />
-          )}
-          {tab === "receive"   && <ReceiveScreen onNavigate={navigate} />}
-          {tab === "stream"    && <StreamScreen onNavigate={navigate} />}
-          {tab === "swap"      && <SwapScreen   onNavigate={navigate} />}
-          {tab === "audit"     && <AuditScreen     onNavigate={navigate} />}
-          {tab === "escrow"    && <EscrowScreen    onNavigate={navigate} />}
-          {tab === "resources" && <ResourcesScreen onNavigate={navigate} />}
-          {tab === "more"      && <MoreScreen       onNavigate={navigate} />}
-        </div>
-
-        {/* ── BOTTOM NAV ────────────────────────────── */}
-        <BottomNav activeTab={tab} onNavigate={navigate} />
-
-        {/* ── WELCOME MODAL ─────────────────────────── */}
-        {showWelcome && (
-          <WelcomeModal onClose={() => setWelcome(false)} />
-        )}
-
-        {/* ── GLOBAL TX STATUS OVERLAY ──────────────── */}
-        <TxStatusBar
-          txState={globalTxState}
-          label={globalTxLabel}
-          onClose={() => setGlobalTxState({ status: "idle" })}
-        />
-
-      </main>
-    </ToastProvider>
-  )
 }
